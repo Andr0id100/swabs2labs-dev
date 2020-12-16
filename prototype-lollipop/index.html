@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Lollipop Testing</title>
+    <svg class="districts"></svg>
+    <link rel="icon" type="image/png" href="/android-chrome-192x192.png" />
+</head>
+
+<body>
+    <script src="d3.min.js"></script>
+    <script>
+        let temp
+        var width = window.innerWidth, height = window.innerHeight
+        const margin = {
+            left: 120,
+            right: 60,
+            top: 20,
+            down: 20
+        }
+
+        var svg = d3.select(".districts")
+            .attr("width", width / 2)
+            .attr("height", height - margin.down)
+        
+        d3.csv("data/district_sample_data_004.csv").then(function (data) {
+            temp = data
+            // data.sort((a, b) => a.samples - b.samples).reverse()
+            var xScale = d3.scaleLinear()
+                .domain([
+                    0,
+                    Math.max(...data.map(d => { return d.samples }))
+                ])
+                .range([margin.left, width/2 - margin.right - margin.left])
+
+            var yScale = d3.scaleBand()
+                .domain(data.map(d => { console.log(proper_capitalize(d.district_name)); return proper_capitalize(d.district_name) }))
+                .range([0, height])
+                .padding(1)
+
+            svg.append("g")
+                .attr("transform", `translate(${margin.left}, ${0})`)
+                .call(d3.axisLeft(yScale))
+
+            svg.append("g")
+                .selectAll("line")
+                .data(data.map((d) => {
+                    return {
+                        samples: d.samples,
+                        district: proper_capitalize(d.district_name)
+                    }
+                }))
+                .enter()
+                .append("line")
+                .attr("x1", xScale(0))
+                .attr("x2", xScale(0))
+                .attr("y1", function (d) { return yScale(d.district) })
+                .attr("y2", function (d) { return yScale(d.district) })
+                .attr("stroke", "grey")
+
+            svg.append("g")
+                .selectAll("circle")
+                .data(data.map((d) => {
+                    return {
+                        samples: d.samples,
+                        district: proper_capitalize(d.district_name)
+                    }
+                }))
+                .enter()
+                .append("circle")
+                .attr("cx", xScale(0))
+                .attr("cy", function (d) { return yScale(d.district) })
+                .attr("r", 4)
+                .style("fill", "#69b3a2")
+                .attr("stroke", "black")
+            
+
+            svg.selectAll("line")
+                .transition()
+                .duration(2000)
+                .attr("x1", function(d) {return xScale(d.samples)})
+            
+            svg.selectAll("circle")
+                .transition()
+                .duration(2000)
+                .attr("cx", function(d) {return xScale(d.samples)})
+
+        })
+
+        function reverse() {
+            var data = temp.sort((a, b) => a.samples - b.samples).reverse()
+
+            
+            var yScale = d3.scaleBand()
+                .domain(data.map(d => { return proper_capitalize(d.district_name) }))
+                .range([0, height])
+                .padding(1)
+
+            svg.selectAll("line")
+                .transition()
+                .duration(2000)
+                .attr("y1", function (d) { return yScale(d.district) })
+                .attr("y2", function (d) { return yScale(d.district) })
+            
+            svg.selectAll("circle")
+                .transition()
+                .duration(2000)
+                .attr("cy", function (d) { return yScale(d.district) })
+            
+            svg
+                .transition()
+                .duration(2000)
+                .call(d3.axisLeft(yScale))
+   
+        }
+        function proper_capitalize(name) {
+            let temp = name.toLowerCase().trim()
+            temp = temp.split(" ")
+            var response = []
+            temp.forEach((t) => {
+                if (t.length == 1) {
+                    response.push(t)
+                    return null
+                }
+                response.push(t[0].toUpperCase() + t.slice(1))
+            })
+            return response.join(" ")
+        }
+        
+        setTimeout(reverse, 2000)
+
+    </script>
+</body>
+
+</html>

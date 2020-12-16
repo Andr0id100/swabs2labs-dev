@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Lab Testing</title>
+    <svg class="districts"></svg>
+    <link rel="icon" type="image/png" href="/android-chrome-192x192.png" />
+</head>
+
+<body>
+    <script src="d3.min.js"></script>
+    <script>
+        let temp
+        var width = window.innerWidth, height = window.innerHeight
+        const margin = {
+            left: 120,
+            right: 60,
+            top: 20,
+            down: 20
+        }
+
+        var svg = d3.select(".districts")
+            .attr("width", width / 2)
+            .attr("height", height - margin.down)
+
+        const DISTRICT = 5
+        d3.csv("data/lab_sample_data_001.csv").then(function (data) {
+            console.log(data)
+            data = data.filter(d => d.district_id == DISTRICT)
+            temp = data
+            // data.sort((a, b) => a.samples - b.samples).reverse()
+            var xScale = d3.scaleLinear()
+                .domain([
+                    0,
+                    Math.max(...data.map(d => { return d.capacity }))
+                ])
+                .range([margin.left, width / 2 - margin.right - margin.left])
+
+            var yScale = d3.scaleBand()
+                .domain(data.map(d => { return d.id }))
+                .range([0, height - margin.down])
+                .padding(1)
+
+            svg.append("g")
+                .attr("transform", `translate(${margin.left}, ${0})`)
+                .call(d3.axisLeft(yScale))
+
+            svg.append("g")
+                .selectAll("line")
+                .data(data.map((d) => {
+                    return {
+                        id: d.id,
+                        lab_type: d.lab_type,
+                        capacity: d.capacity,
+                        backlogs: d.backlogs
+                    }
+                }))
+                .enter()
+                .append("line")
+                .attr("x1", xScale(0))
+                .attr("x2", xScale(0))
+                .attr("y1", function (d) { return yScale(d.id) })
+                .attr("y2", function (d) { return yScale(d.id) })
+                .attr("stroke", "grey")
+
+            svg.append("g")
+                .selectAll("circle.free")
+                .data(data.map((d) => {
+                    return {
+                        id: d.id,
+                        lab_type: d.lab_type,
+                        capacity: d.capacity,
+                        backlogs: d.backlogs
+                    }
+                }))
+                .enter()
+                .append("circle")
+                .attr("cx", xScale(0))
+                .attr("cy", function (d) { return yScale(d.id) })
+                .attr("r", 8)
+                .style("fill", d => d.lab_type === "0" ? "#69b3a2" : "#ed553b")
+                .attr("stroke", "black")
+                .classed("free", true)
+
+            svg.selectAll("line")
+                .transition()
+                .duration(2000)
+                .attr("x1", function (d) { return xScale(d.capacity) })
+
+            svg.selectAll("circle")
+                .transition()
+                .duration(2000)
+                .attr("cx", function (d) { return xScale(d.capacity) })
+
+        })
+
+        function reduce(xScale) {
+            // var data = temp.sort((a, b) => a.samples - b.samples).reverse()
+            var data = temp
+
+            var xScale = d3.scaleLinear()
+                .domain([
+                    0,
+                    Math.max(...data.map(d => { return d.capacity }))
+                ])
+                .range([margin.left, width / 2 - margin.right - margin.left])
+
+            var yScale = d3.scaleBand()
+                .domain(data.map(d => { return d.id }))
+                .range([0, height - margin.down])
+                .padding(1)
+            
+            // Markers for the capacity
+            svg.append("g")
+                .selectAll("circle.capacity")
+                .data(data.map((d) => {
+                    return {
+                        id: d.id,
+                        lab_type: d.lab_type,
+                        capacity: d.capacity,
+                        backlogs: d.backlogs
+                    }
+                }))
+                .enter()
+                .append("circle")
+                .attr("cx", (d) => xScale(d.capacity))
+                .attr("cy", function (d) { return yScale(d.id) })
+                .attr("r", 2)
+                .style("fill", "#0b032d")
+                .attr("stroke", "black")
+                .classed("capacity", true)
+                .style("opacity", 0)
+
+                .transition()
+                    .duration(2000)
+                    .style("opacity", 1)
+
+
+
+            svg.selectAll("line")
+                .transition()
+                .duration(2000)
+                .attr("x1", function (d) { return xScale(d.capacity - d.backlogs) })
+
+            svg.selectAll("circle.free")
+                .transition()
+                .duration(2000)
+                .attr("cx", function (d) { return xScale(d.capacity - d.backlogs) })
+
+        }
+        setTimeout(reduce, 2000)
+    </script>
+</body>
+
+</html>

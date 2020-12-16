@@ -1,0 +1,6 @@
+transfer_type,source,destination,samples transferred,Remarks (this column is not required for submission)
+0,5,1,500,Transfer 500 swabs from district 5 to lab 1
+0,5,2,200,Transfer 200 swabs from district 5 to lab 2
+1,5,5,300,Keep a backlog of 300 samples in district 5
+0,22,4,100,Transfer 100 samples from district 22 to lab 4
+1,22,22,200,Keep a backlog of 200 samples in district 22

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="android-chrome-192x192.png">
+
+<body>
+    <script src="d3.min.js"></script>
+    <script>
+        const width = window.innerWidth
+        const height = window.innerHeight
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width/2)
+            .attr("height", height)
+            // .attr("transform", `translate(${width/2}, 0)`)
+            .attr("style", "float:right")
+
+        var table = d3.select("body").append("table")
+        var thead = table.append("thead")
+        var tbody = table.append("tbody")
+
+
+        const columns  = ['capacity', 'backlogs']
+
+        d3.csv("data/lab_sample_data_001.csv").then(function(data) {
+            var rows = tbody.selectAll("tr")
+                .data(data)
+            .enter().append("tr")
+            
+            // console.log(rows)
+            
+            var cells = rows.selectAll("td")
+                .data((row) => {
+                    return columns.map((column) => {
+                        return {column: column, value: row[column]}
+                    })
+                })
+                .enter().append("td")
+                .text((row) => {return row.value}) 
+                .attr("style", "height:15px") 
+            
+            svg.attr("height", 86*22)
+                // console.log(d3.select("table").offsetHeight)
+                
+            svg.selectAll("rect")
+                .data(data)
+                .enter().append("rect")
+                    .attr("y", (d) => {return 7 + (d.id-1) * (21)})
+                    .attr("width", (d) => {return d.capacity/5000 * width/2})
+                    .attr("height", 5)
+                    .attr("fill", "green");    
+
+        })
+
+    </script>
+</body>

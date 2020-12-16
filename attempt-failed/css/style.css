@@ -1,0 +1,33 @@
+.district {
+    /* fill: #92a8d1; */
+    stroke: #ffffff;
+    stroke-width: .5px;
+}
+.district.highlighted {
+    fill: #2c2fd1;
+}
+.hidden {
+    visibility: hidden;
+}
+
+th {
+    white-space: nowrap;
+    /* padding-right: 40px; */
+    text-align: left
+}
+
+th.dname-col {
+    padding-right: 40px;
+}
+
+.row {
+    background-color: #b8daff;
+}
+
+.row.highlighted {
+    background-color: #2c2fd1;
+}
+
+.graph {
+    background-color: #ffffff;
+}
