@@ -1,2 +1,2 @@
 # swabs2labs-dev
-Archived code from the Swabs2Labs hackathon
+Archived code from my submission to the Swabs2Labs hackathon
